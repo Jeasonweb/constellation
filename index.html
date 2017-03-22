@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>星座查询</title>
+		<meta name="Description" content=""/>		
+		<meta name="Keywords" content=""/>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<style type="text/css">
+			body{
+				width: 60%;
+				margin: 0 auto;
+			}
+			h1{
+				width: 100%;
+				text-align: center;
+			}
+			select option{
+				width: 100%;
+				text-align: center;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>星座查询</h1>
+		<select name="" id='star'>
+			<option value="" disabled>---请选择星座---</option>
+			<option value="水瓶座">水瓶座</option>
+			<option value="双鱼座">双鱼座</option>
+			<option value="白羊座">白羊座</option>
+			<option value="金牛座">金牛座</option>
+			<option value="双子座">双子座</option>
+			<option value="巨蟹座">巨蟹座</option>
+			<option value="狮子座">狮子座</option>
+			<option value="处女座">处女座</option>
+			<option value="天秤座">天秤座</option>
+			<option value="天蝎座">天蝎座</option>
+			<option value="射手座">射手座</option>
+			<option value="魔羯座">魔羯座</option>
+		</select>
+		<select name="" id="selectedDate">
+			<option value="" disabled>---请选择时间---</option>today,tomorrow,week,nextweek,month,year
+			<option value="today">今天</option>
+			<option value="tomorrow">明天</option>
+			<option value="week">这周</option>
+			<option value="nextweek">下周</option>
+			<option value="month">当月</option>
+			<option value="year">今年</option>
+		</select>
+		<div class="container">
+			
+		</div>
+	</body>
+</html>
+<script src="js/jquery-1.11.3.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+	$('select').on('change',function(){
+		var consName=$('#star').val();		
+		var type=$('#selectedDate').val();
+		if(!console||!type){
+			return;
+		}
+		consName=encodeURI(consName);
+		postDataFromClient(consName,type,function(jsonData){
+			alert('网络错误');
+		},function(jsonData){
+			if(jsonData.statusText==='OK'){
+				jsonData=jsonData.responseText;
+				jsonData=JSON.parse(jsonData);
+				var tempStr='';
+				if(!jsonData.datetime){
+					jsonData.datetime=jsonData.date;
+				}
+				if(!jsonData.all){
+					jsonData.all=jsonData.job||'无';
+				}
+				if(!jsonData.summary){
+					jsonData.summary=jsonData.work||'无';
+				}
+				if(!jsonData.money){
+					jsonData.money='无';
+				}
+				tempStr+='时间：'+jsonData.datetime+'<br/>星座：'+jsonData.name+'<br/>总体趋势：'
+				+jsonData.all+'<br/>健康指数：'+jsonData.health+'<br/>恋爱指数：'+jsonData.love
+				+'<br/>金钱指数：'+jsonData.money+'<br/>详情：'+jsonData.summary;
+				$('.container').html(tempStr);						
+			}
+		})
+	})
+
+	/*$(document).ready(function(){
+		var consName=$('#star').val();		
+		var type=$('#selectedDate').val();
+		if(!console||!type){
+			return;
+		}
+		consName=encodeURI(consName);
+		postDataFromClient(consName,type,function(jsonData){
+			alert('网络错误');
+		},function(jsonData){
+			if(jsonData.statusText==='OK'){
+				jsonData=jsonData.responseText;
+				jsonData=JSON.parse(jsonData);
+				var tempStr='';
+				tempStr+='时间：'+jsonData.datetime+'<br/>星座：'+jsonData.name+'<br/>总体趋势：'
+				+jsonData.all+'<br/>健康指数：'+jsonData.health+'<br/>恋爱指数：'+jsonData.love
+				+'<br/>金钱指数：'+jsonData.money+'<br/>详情：'+jsonData.summary;
+				$('.container').html(tempStr);						
+			}
+		})
+	});	*/
+	
+	//从服务器端获取数据
+	function postDataFromClient(name, type, successFunction, failFunction) {
+		$.ajax({
+		        type:"POST",
+		        url: 'common.php',
+		        data:{'consName':name,'type':type},
+		        async: true,
+		        dataType: "jsonp",
+		        error: failFunction,
+		        success: successFunction
+		    })
+		}
+</script>
+
